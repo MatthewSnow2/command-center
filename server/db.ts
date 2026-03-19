@@ -91,6 +91,16 @@ export function initDatabase(): Database.Database {
       created_at INTEGER NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS routing_weights (
+      agent_id TEXT NOT NULL,
+      task_type TEXT NOT NULL,
+      success_rate REAL NOT NULL DEFAULT 0.5,
+      total_missions INTEGER NOT NULL DEFAULT 0,
+      avg_duration_ms REAL,
+      last_updated INTEGER NOT NULL,
+      PRIMARY KEY (agent_id, task_type)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_missions_status ON missions(status);
     CREATE INDEX IF NOT EXISTS idx_mission_logs_mission ON mission_logs(mission_id);
     CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
@@ -311,6 +321,74 @@ export function syncAgentCapabilities(projectRoot: string): number {
   }
 
   return synced;
+}
+
+// ── Routing Weights (learned from outcomes) ─────────────────────────
+
+export interface RoutingWeight {
+  agent_id: string;
+  task_type: string;
+  success_rate: number;
+  total_missions: number;
+  avg_duration_ms: number | null;
+  last_updated: number;
+}
+
+export function getRoutingWeight(agentId: string, taskType: string): RoutingWeight | null {
+  const row = getDb().prepare(
+    'SELECT * FROM routing_weights WHERE agent_id = ? AND task_type = ?'
+  ).get(agentId, taskType) as Record<string, unknown> | undefined;
+  if (!row) return null;
+  return {
+    agent_id: row.agent_id as string,
+    task_type: row.task_type as string,
+    success_rate: row.success_rate as number,
+    total_missions: row.total_missions as number,
+    avg_duration_ms: row.avg_duration_ms as number | null,
+    last_updated: row.last_updated as number,
+  };
+}
+
+export function listRoutingWeights(): RoutingWeight[] {
+  const rows = getDb().prepare('SELECT * FROM routing_weights ORDER BY agent_id, task_type').all() as Array<Record<string, unknown>>;
+  return rows.map(row => ({
+    agent_id: row.agent_id as string,
+    task_type: row.task_type as string,
+    success_rate: row.success_rate as number,
+    total_missions: row.total_missions as number,
+    avg_duration_ms: row.avg_duration_ms as number | null,
+    last_updated: row.last_updated as number,
+  }));
+}
+
+/**
+ * Recalculate routing weight for an agent+task_type from outcome_logs.
+ * Called after each mission completes or fails.
+ */
+export function updateRoutingWeight(agentId: string, taskType: string): void {
+  const now = Math.floor(Date.now() / 1000);
+  const stats = getDb().prepare(`
+    SELECT
+      COUNT(*) as total,
+      SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as successes,
+      AVG(duration_ms) as avg_ms
+    FROM outcome_logs
+    WHERE agent_id = ? AND task_type = ?
+  `).get(agentId, taskType) as { total: number; successes: number; avg_ms: number | null };
+
+  if (!stats || stats.total === 0) return;
+
+  const successRate = stats.successes / stats.total;
+
+  getDb().prepare(`
+    INSERT INTO routing_weights (agent_id, task_type, success_rate, total_missions, avg_duration_ms, last_updated)
+    VALUES (?, ?, ?, ?, ?, ?)
+    ON CONFLICT(agent_id, task_type) DO UPDATE SET
+      success_rate=?, total_missions=?, avg_duration_ms=?, last_updated=?
+  `).run(
+    agentId, taskType, successRate, stats.total, stats.avg_ms, now,
+    successRate, stats.total, stats.avg_ms, now,
+  );
 }
 
 // ── Schedules ───────────────────────────────────────────────────────

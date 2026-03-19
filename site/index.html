@@ -274,12 +274,80 @@
     footer a { color: var(--text-secondary); text-decoration: none; }
     footer a:hover { color: var(--text-primary); }
 
+    /* ── VR TEASER BANNER ─────────────────── */
+    .vr-banner {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(6, 182, 212, 0.1));
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 10px;
+      padding: 1.25rem 1.75rem;
+      margin: 2rem auto 0;
+      max-width: 600px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .vr-banner::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+    }
+    .vr-banner-label {
+      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px;
+      background: rgba(168, 85, 247, 0.2); color: var(--accent-purple);
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; margin-bottom: 0.5rem;
+    }
+    .vr-banner h3 {
+      font-size: 1.05rem; font-weight: 700; margin-bottom: 0.35rem;
+      color: var(--text-primary);
+    }
+    .vr-banner p {
+      font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;
+    }
+
+    /* ── ECOSYSTEM ────────────────────────── */
+    .ecosystem-section { background: var(--bg-deep); }
+    .eco-flow {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.5rem;
+    }
+    .eco-node {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1rem 1.25rem; text-align: center;
+      min-width: 140px; transition: all 0.25s;
+    }
+    .eco-node:hover { border-color: var(--border-light); transform: translateY(-2px); }
+    .eco-node h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .eco-node p { font-size: 0.7rem; color: var(--text-muted); }
+    .eco-node.highlight { border-color: var(--accent-blue); box-shadow: 0 0 16px rgba(59, 130, 246, 0.2); }
+    .eco-node.highlight h4 { color: var(--accent-blue); }
+    .eco-arrow { color: var(--accent-cyan); font-size: 1.4rem; opacity: 0.5; }
+    .eco-desc-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .eco-card {
+      padding: 1.25rem; border-radius: 10px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      transition: all 0.25s;
+    }
+    .eco-card:hover { border-color: var(--border-light); }
+    .eco-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.15rem; }
+    .eco-card .eco-role {
+      font-size: 0.7rem; color: var(--accent-cyan); letter-spacing: 0.08em;
+      text-transform: uppercase; margin-bottom: 0.5rem;
+    }
+    .eco-card p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
+
     /* ── RESPONSIVE ───────────────────────── */
     @media (max-width: 640px) {
       .nav-links { display: none; }
       .flow { grid-template-columns: 1fr; }
       .tier-grid { grid-template-columns: 1fr; }
       .feat-grid { grid-template-columns: 1fr; }
+      .eco-desc-grid { grid-template-columns: 1fr; }
+      .eco-flow { flex-direction: column; }
+      .eco-arrow { transform: rotate(90deg); }
       section { padding: 3rem 1rem; }
     }
   </style>
@@ -294,6 +362,7 @@
       <a href="#how-it-works">How It Works</a>
       <a href="#tiers">Agent Tiers</a>
       <a href="#features">Features</a>
+      <a href="#ecosystem">Ecosystem</a>
       <a href="#roadmap">Roadmap</a>
     </div>
     <a href="https://github.com/MatthewSnow2/command-center" class="nav-gh" target="_blank">
@@ -314,6 +383,11 @@
   <div class="hero-actions">
     <a href="https://github.com/MatthewSnow2/command-center" class="btn btn-primary" target="_blank">Get Started</a>
     <a href="#tiers" class="btn btn-secondary">Learn More</a>
+  </div>
+  <div class="vr-banner">
+    <span class="vr-banner-label">Coming April 1st</span>
+    <h3>VR Bridge &mdash; Starship Agents</h3>
+    <p>WebXR Enterprise-D bridge where CMD agents appear as Starfleet officers. Three.js + WebXR &mdash; works in browser AND Quest 3 VR headset. Same URL for both.</p>
   </div>
 </section>
 
@@ -461,6 +535,92 @@
         <div class="feat-icon">&#x1f4c8;</div>
         <h3>Outcome Tracking</h3>
         <p>Every dispatch logs task type, agent, status, duration, and reasoning. Routing quality is measurable and improvable.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">&#x1f4ac;</div>
+        <h3>Ask Data Chat Advisor</h3>
+        <p>Lightweight Q&amp;A via <code>/api/chat</code> &mdash; ask about agents, missions, schedules, and system status without spawning agents.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">&#x1f4f1;</div>
+        <h3>Telegram Integration</h3>
+        <p>Use <code>/cmd</code> in Telegram to query CMD directly via ClaudeClaw/DataTG. Connected through the <code>COMMAND_CENTER_URL</code> env var.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ST METRO ECOSYSTEM -->
+<section id="ecosystem" class="ecosystem-section">
+  <div class="container">
+    <span class="section-label">ST Metro Ecosystem</span>
+    <h2 class="section-title">CMD is the orchestration layer</h2>
+    <p class="section-desc">
+      A self-improving autonomous software production system. CMD sits at the center &mdash; dispatching work, coordinating agents, and connecting every zone.
+    </p>
+
+    <div class="eco-flow">
+      <div class="eco-node">
+        <h4>ST Metro</h4>
+        <p>Ecosystem</p>
+      </div>
+      <span class="eco-arrow">&#8594;</span>
+      <div class="eco-node">
+        <h4>Metroplex</h4>
+        <p>Autonomous Builds</p>
+      </div>
+      <span class="eco-arrow">&#8594;</span>
+      <div class="eco-node highlight">
+        <h4>CMD</h4>
+        <p>Orchestration</p>
+      </div>
+      <span class="eco-arrow">&#8594;</span>
+      <div class="eco-node">
+        <h4>Named Agents</h4>
+        <p>Soundwave, Ravage, Content</p>
+      </div>
+      <span class="eco-arrow">&#8594;</span>
+      <div class="eco-node">
+        <h4>ClaudeClaw / DataTG</h4>
+        <p>Telegram Interface</p>
+      </div>
+      <span class="eco-arrow">&#8594;</span>
+      <div class="eco-node">
+        <h4>Sky-Lynx</h4>
+        <p>Learning Loop</p>
+      </div>
+    </div>
+
+    <div class="eco-desc-grid">
+      <div class="eco-card">
+        <h4>Software Factory</h4>
+        <div class="eco-role">Metroplex + YCE</div>
+        <p>The production floor. Metroplex orchestrates the full build pipeline &mdash; from idea intake through coding, review, and deployment. YCE is the autonomous engineer that does the actual building.</p>
+      </div>
+      <div class="eco-card">
+        <h4>Command Center</h4>
+        <div class="eco-role">Data &mdash; Chief of Staff</div>
+        <p>Mission control for the ecosystem. Data acts as Chief of Staff &mdash; receiving requests, dispatching tasks, and coordinating across all zones via the web UI and Telegram.</p>
+      </div>
+      <div class="eco-card">
+        <h4>Observatory</h4>
+        <div class="eco-role">Sky-Lynx</div>
+        <p>The self-improvement engine. Observes sessions, builds, and metrics, then feeds improvements back into the system. Auto-applies CLAUDE.md patches, hookify rules, and process changes.</p>
+      </div>
+      <div class="eco-card">
+        <h4>Agent Network</h4>
+        <div class="eco-role">Research &middot; Signals &middot; Social</div>
+        <p>Distributed agents on cron schedules: Research Agents (multi-LLM signal fleet), Starscream (social voice), AutoResearch (GPU experiments on AlienPC), and Perceptor (cross-session context).</p>
+      </div>
+      <div class="eco-card">
+        <h4>ClaudeClaw / DataTG</h4>
+        <div class="eco-role">Telegram Interface</div>
+        <p>Persistent Telegram bot with the "Data" persona. Quick tasks, status checks, and <code>/cmd</code> queries routed to Command Center. The primary human interface for day-to-day operations.</p>
+      </div>
+      <div class="eco-card">
+        <h4>Quality Ratchet</h4>
+        <div class="eco-role">Standards Enforcer</div>
+        <p>Ensures quality only moves up. ReviewGate scores builds, Sky-Lynx analyzes patterns, and the ratchet prevents regression once baselines are established.</p>
       </div>
     </div>
   </div>

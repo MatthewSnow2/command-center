@@ -174,6 +174,11 @@ Autonomous orchestrators that collaborate with CMD as equals, not subordinates. 
 - **Outcome logging** — Track routing quality per agent per task type
 - **Scheduled missions** — Recurring missions on configurable intervals (5m, 1h, 24h, 7d)
 
+### Ask Data Chat Advisor
+- **Direct Q&A** — `/api/chat` endpoint for quick questions about the system without spawning agents
+- **Conversational** — Data answers questions about agents, missions, schedules, and status
+- **Zero overhead** — No agent dispatch, no mission lifecycle; fast informational responses
+
 ### Command Center UI
 - **Chat-style mission input** — Type a goal, see classification + suggested agent inline, approve with one click
 - **Mission Detail** — Real-time logs, progress updates, results
@@ -191,8 +196,15 @@ Autonomous orchestrators that collaborate with CMD as equals, not subordinates. 
 - **Task store** — In-memory task tracking with state machine (queued → running → completed/failed)
 - **Progress streaming** — Real-time stderr logging for execution visibility
 
+### Ask Data — Chat Advisor
+- **`/api/chat` endpoint** — Lightweight Q&A about the system without spawning agents
+- Ask questions about agents, missions, schedules, and system status
+- Returns conversational answers from Data (the primary orchestrator persona)
+- No agent dispatch overhead — fast, direct responses for informational queries
+
 ### Integration
 - **DataTG (Galvatron)** — Telegram bot relay for quick tasks and status queries
+- **ClaudeClaw/Telegram** — `/cmd` command in Telegram routes queries to CMD via `COMMAND_CENTER_URL` env var
 - **Stock repos** — Auto-clone and sync agent templates from GitHub
 - **pm2 managed** — All services run as pm2 processes with exponential backoff
 
@@ -223,6 +235,7 @@ All endpoints are under `/api`:
 | `POST` | `/schedules` | Create schedule (goal + interval) |
 | `PUT` | `/schedules/:id` | Update schedule (enable/disable/change interval) |
 | `DELETE` | `/schedules/:id` | Delete schedule |
+| `POST` | `/chat` | Ask Data — lightweight Q&A without agent dispatch |
 
 Named agents expose standard A2A endpoints:
 

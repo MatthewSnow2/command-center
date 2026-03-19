@@ -8,6 +8,7 @@ import {
   getOutcomeStats,
   listAgentCapabilities,
   getAgentCapabilities,
+  listRoutingWeights,
   createSchedule,
   listSchedules,
   updateSchedule,
@@ -307,6 +308,45 @@ router.post('/stock-agents/load', (req, res) => {
   }
 
   res.status(400).json({ error: 'Provide agent_id or category' });
+});
+
+// ── Routing Insights (Phase 5 Learning Loop) ────────────────────────
+
+router.get('/routing/insights', (_req, res) => {
+  const weights = listRoutingWeights();
+  const stats = getOutcomeStats() as Array<Record<string, unknown>>;
+  const capabilities = listAgentCapabilities();
+
+  // Identify gap patterns — task types with high failure rates
+  const gapPatterns = weights
+    .filter(w => w.total_missions >= 2 && w.success_rate < 0.5)
+    .map(w => ({
+      agent_id: w.agent_id,
+      task_type: w.task_type,
+      success_rate: Math.round(w.success_rate * 100),
+      total: w.total_missions,
+      recommendation: `${w.agent_id} struggles with ${w.task_type} tasks (${Math.round(w.success_rate * 100)}% success). Consider routing elsewhere or adding capabilities.`,
+    }));
+
+  // Top performers — agent+task combos with high success
+  const topPerformers = weights
+    .filter(w => w.total_missions >= 2 && w.success_rate >= 0.8)
+    .sort((a, b) => b.success_rate - a.success_rate || b.total_missions - a.total_missions)
+    .map(w => ({
+      agent_id: w.agent_id,
+      task_type: w.task_type,
+      success_rate: Math.round(w.success_rate * 100),
+      total: w.total_missions,
+      avg_duration_s: w.avg_duration_ms ? Math.round(w.avg_duration_ms / 1000) : null,
+    }));
+
+  res.json({
+    routing_weights: weights,
+    gap_patterns: gapPatterns,
+    top_performers: topPerformers,
+    total_outcomes: stats.reduce((sum, s) => sum + (s.total as number), 0),
+    learning_active: weights.some(w => w.total_missions >= 3),
+  });
 });
 
 // ── Schedules ────────────────────────────────────────────────────────

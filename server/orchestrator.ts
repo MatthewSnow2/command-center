@@ -10,6 +10,9 @@ import {
   logOutcome,
   getAgentCapabilities,
   listAgentCapabilities,
+  getRoutingWeight,
+  listRoutingWeights,
+  updateRoutingWeight,
   type AgentCapabilities,
 } from './db.js';
 import { getStockAgentPrompt } from './stock-loader.js';
@@ -107,13 +110,19 @@ function detectCapabilityGap(agentId: string, required: RequiredCapabilities): C
 function findCapableAgent(agents: AgentCard[], required: RequiredCapabilities, taskType: string): AgentCard | null {
   const allCaps = listAgentCapabilities();
   const capMap = new Map(allCaps.map(c => [c.agent_id, c]));
+  const allWeights = listRoutingWeights();
+  const weightMap = new Map(allWeights.map(w => [`${w.agent_id}:${w.task_type}`, w]));
 
   const scored = agents
     .filter(a => a.status === 'available')
     .map(agent => {
       const cap = capMap.get(agent.id);
       let score = 0;
+
+      // Skill match (static)
       if (agent.skills.some(s => s.toLowerCase() === taskType)) score += 10;
+
+      // Capability match (static)
       if (cap) {
         if (required.needsWebSearch) score += cap.tools.includes('WebSearch') ? 15 : -20;
         if (required.needsMcp.length > 0) score += required.needsMcp.every(m => cap.mcp_servers.includes(m)) ? 10 : -20;
@@ -122,6 +131,15 @@ function findCapableAgent(agents: AgentCard[], required: RequiredCapabilities, t
       } else if (required.needsWebSearch || required.needsMcp.length > 0 || required.needsSubAgents) {
         score -= 20;
       }
+
+      // Learned routing weight (dynamic — grows with data)
+      const weight = weightMap.get(`${agent.id}:${taskType}`);
+      if (weight && weight.total_missions >= 3) {
+        // Scale: 0% success = -10, 50% = 0, 100% = +10
+        const learnedBonus = (weight.success_rate - 0.5) * 20;
+        score += learnedBonus;
+      }
+
       return { agent, score };
     })
     .sort((a, b) => b.score - a.score);
@@ -291,6 +309,7 @@ export async function approveMission(missionId: string): Promise<void> {
     const planReasoning = mission.plan?.reasoning ?? '';
     const taskType = planReasoning.match(/Classified as (\w+)/)?.[1] ?? 'unknown';
     logOutcome(missionId, taskType, agentId, planReasoning, 'completed', durationMs);
+    updateRoutingWeight(agentId, taskType);
   } catch (err) {
     const durationMs = Date.now() - startTime;
     const errMsg = err instanceof Error ? err.message : String(err);
@@ -304,6 +323,7 @@ export async function approveMission(missionId: string): Promise<void> {
     const planReasoning = mission.plan?.reasoning ?? '';
     const taskType = planReasoning.match(/Classified as (\w+)/)?.[1] ?? 'unknown';
     logOutcome(missionId, taskType, agentId, planReasoning, 'failed', durationMs);
+    updateRoutingWeight(agentId, taskType);
   } finally {
     updateAgentStatus(agentId, 'available', null);
   }
