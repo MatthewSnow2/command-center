@@ -266,7 +266,8 @@ Named agents expose standard A2A endpoints:
 | Phase 3 | Done | A2A protocol + Research agent (Soundwave) |
 | Phase 4 | Done | Coding agent (Ravage) + Content agent + Stock agent loader + bug fixes |
 | Phase 4B | Done | Access model, Named Agents page, capability-aware routing, gap detection, schedules, chatbot UI, onboarding |
-| Phase 5 | Planned | Learning loop — orchestrator routing quality + Tier 1 agent self-learning via Sky-Lynx |
+| Phase 5 | **In Progress** | EGO learning loop — routing weight learning, experiment tracking, quality evaluation. Freudian model: Id (agents), Ego (orchestrator+evaluator), Super-ego (Sky-Lynx+guardrails) |
+| Phase 5B | Planned | Embedded MCP server — CMD exposes tools (agents, missions, routing, schedules) via MCP on the same port. Zero extra setup for Claude Code users |
 | Phase 6 | Planned | Peer collaboration — Metroplex A2A integration, async priority queue, health monitoring |
 | Phase 7 | Planned | Tier 4 ClaudeClaw agents — framework-coupled agents in ClaudeClaw runtime |
 
