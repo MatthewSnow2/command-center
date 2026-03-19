@@ -13,6 +13,10 @@ async function fetchJson<T>(url: string, opts?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  chat: (message: string) => fetchJson<{ reply: string }>('/chat', {
+    method: 'POST',
+    body: JSON.stringify({ message }),
+  }),
   listMissions: () => fetchJson<{ missions: unknown[] }>('/missions'),
   getMission: (id: string) => fetchJson<{ mission: unknown; logs: unknown[] }>(`/missions/${id}`),
   createMission: (goal: string) => fetchJson<{ mission: unknown; classification: unknown }>('/missions', {

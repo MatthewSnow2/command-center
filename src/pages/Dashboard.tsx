@@ -25,12 +25,22 @@ interface ProposalResult {
   classification: Classification;
 }
 
+type InputMode = 'chat' | 'mission';
+
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export function Dashboard() {
   const [missions, setMissions] = useState<Mission[]>([]);
   const [goal, setGoal] = useState('');
+  const [mode, setMode] = useState<InputMode>('chat');
   const [creating, setCreating] = useState(false);
   const [proposal, setProposal] = useState<ProposalResult | null>(null);
   const [approving, setApproving] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -82,6 +92,29 @@ export function Dashboard() {
     inputRef.current?.focus();
   };
 
+  const handleChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!goal.trim()) return;
+    const question = goal.trim();
+    setChatMessages(prev => [...prev, { role: 'user', content: question }]);
+    setGoal('');
+    setChatLoading(true);
+    setError(null);
+    try {
+      const { reply } = await api.chat(question);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    if (mode === 'chat') return handleChat(e);
+    return handleCreate(e);
+  };
+
   const statusBadge = (s: string) => {
     const colors: Record<string, string> = {
       proposed: 'bg-blue-900 text-blue-300',
@@ -106,28 +139,82 @@ export function Dashboard() {
     <div className="max-w-4xl">
       <h1 className="text-2xl font-bold mb-6">Missions</h1>
 
-      {/* Chat-style Mission Input */}
+      {/* Input with mode toggle */}
       <div className="mb-8">
-        <form onSubmit={handleCreate}>
+        <div className="flex items-center gap-1 mb-2">
+          <button
+            onClick={() => setMode('chat')}
+            className={`px-3 py-1 rounded-t text-xs font-medium transition-colors ${
+              mode === 'chat' ? 'bg-gray-800 text-indigo-400' : 'text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            Ask Data
+          </button>
+          <button
+            onClick={() => setMode('mission')}
+            className={`px-3 py-1 rounded-t text-xs font-medium transition-colors ${
+              mode === 'mission' ? 'bg-gray-800 text-blue-400' : 'text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            New Mission
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
           <div className="flex gap-3">
             <input
               ref={inputRef}
               type="text"
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
-              placeholder="Tell Data what to do..."
-              className="flex-1 px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-base"
-              disabled={creating}
+              placeholder={mode === 'chat' ? 'Ask Data a question...' : 'Describe a mission to dispatch...'}
+              className={`flex-1 px-4 py-3 bg-gray-900 border rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none text-base ${
+                mode === 'chat' ? 'border-indigo-800 focus:border-indigo-500' : 'border-gray-700 focus:border-blue-500'
+              }`}
+              disabled={creating || chatLoading}
             />
             <button
               type="submit"
-              disabled={creating || !goal.trim()}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 rounded-lg font-medium transition-colors"
+              disabled={creating || chatLoading || !goal.trim()}
+              className={`px-6 py-3 disabled:bg-gray-700 disabled:text-gray-500 rounded-lg font-medium transition-colors ${
+                mode === 'chat' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-blue-600 hover:bg-blue-500'
+              }`}
             >
-              {creating ? 'Analyzing...' : 'Send'}
+              {chatLoading ? 'Thinking...' : creating ? 'Analyzing...' : mode === 'chat' ? 'Ask' : 'Send'}
             </button>
           </div>
         </form>
+
+        {/* Chat messages */}
+        {chatMessages.length > 0 && mode === 'chat' && (
+          <div className="mt-3 space-y-3 max-h-96 overflow-y-auto">
+            {chatMessages.map((msg, i) => (
+              <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
+                {msg.role === 'assistant' && (
+                  <div className="w-7 h-7 rounded-full bg-indigo-900 flex items-center justify-center text-indigo-300 text-xs font-bold shrink-0 mt-0.5">
+                    D
+                  </div>
+                )}
+                <div className={`max-w-[80%] px-4 py-2.5 rounded-lg text-sm whitespace-pre-wrap ${
+                  msg.role === 'user'
+                    ? 'bg-indigo-900/40 text-gray-200'
+                    : 'bg-gray-900 border border-gray-800 text-gray-300'
+                }`}>
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+            {chatLoading && (
+              <div className="flex gap-3">
+                <div className="w-7 h-7 rounded-full bg-indigo-900 flex items-center justify-center text-indigo-300 text-xs font-bold shrink-0">
+                  D
+                </div>
+                <div className="px-4 py-2.5 bg-gray-900 border border-gray-800 rounded-lg text-sm text-gray-500">
+                  Thinking...
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {error && <p className="mt-2 text-red-400 text-sm">{error}</p>}
 

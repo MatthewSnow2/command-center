@@ -14,6 +14,7 @@ import {
   deleteSchedule,
 } from './db.js';
 import { nextRunFromInterval } from './scheduler.js';
+import { chatWithData } from './chat.js';
 import {
   proposeMission,
   approveMission,
@@ -35,6 +36,22 @@ import {
 import type { CreateMissionRequest } from '../shared/types.js';
 
 export const router = Router();
+
+// ── Chat (lightweight advisor) ────────────────────────────────────────
+
+router.post('/chat', async (req, res) => {
+  const { message } = req.body as { message?: string };
+  if (!message?.trim()) {
+    res.status(400).json({ error: 'message is required' });
+    return;
+  }
+  try {
+    const reply = await chatWithData(message.trim());
+    res.json({ reply });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
 
 // ── Missions ─────────────────────────────────────────────────────────
 
