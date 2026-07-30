@@ -23,6 +23,10 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         RESEARCH_AGENT_PORT: '3143',
+        // 2026-07-25: PM2's frozen ambient env omits ~/.local/bin, where the
+        // `claude` binary lives, so mission spawns died with "spawn claude
+        // ENOENT" (killed the Soundwave vacation autonomy test on day 1).
+        PATH: '/home/apexaipc/.local/bin:/home/apexaipc/.npm-global/bin:/usr/local/bin:/usr/bin:/bin',
       },
       exp_backoff_restart_delay: 1000,
       max_restarts: 10,
@@ -36,6 +40,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         CODING_AGENT_PORT: '3144',
+        // See agent-research: ~/.local/bin needed for the `claude` binary.
+        PATH: '/home/apexaipc/.local/bin:/home/apexaipc/.npm-global/bin:/usr/local/bin:/usr/bin:/bin',
       },
       exp_backoff_restart_delay: 1000,
       max_restarts: 10,
@@ -49,6 +55,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         CONTENT_AGENT_PORT: '3145',
+        // See agent-research: ~/.local/bin needed for the `claude` binary.
+        PATH: '/home/apexaipc/.local/bin:/home/apexaipc/.npm-global/bin:/usr/local/bin:/usr/bin:/bin',
       },
       exp_backoff_restart_delay: 1000,
       max_restarts: 10,
@@ -62,6 +70,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         DATA_AGENT_PORT: '3146',
+        // See agent-research: ~/.local/bin needed for the `claude` binary.
+        PATH: '/home/apexaipc/.local/bin:/home/apexaipc/.npm-global/bin:/usr/local/bin:/usr/bin:/bin',
       },
       exp_backoff_restart_delay: 1000,
       max_restarts: 10,
@@ -75,6 +85,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         KUP_AGENT_PORT: '3147',
+        // See agent-research: ~/.local/bin needed for the `claude` binary.
+        PATH: '/home/apexaipc/.local/bin:/home/apexaipc/.npm-global/bin:/usr/local/bin:/usr/bin:/bin',
       },
       exp_backoff_restart_delay: 1000,
       max_restarts: 10,
