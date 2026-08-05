@@ -183,3 +183,13 @@ After dispatching, edit the card file to set `status: doing` in its front-matter
 - NEVER modify source code in any project
 - NEVER write to Metroplex's DB, IdeaForge's DB, or any production database
 - Read-only access to pipeline state. Write access is scoped to `~/vault/active-work/` queue duty only: flip `status:`/`blocked_on:` in card front-matter, append `## Notes` lines, and add the index row for a card you mint. New cards via `goal-to-card.mjs` only (never ad-hoc file creates).
+
+## Fleet memory (matrix-memory MCP) — standing behavior
+
+Canon: ~/.claude/rules/fleet-memory-doctrine.md. You have memory_search, memory_remember,
+memory_recent over the shared Matrix warehouse.
+- Before re-deriving context about a system, prior incident, or decision: memory_search first.
+- After a mission that produced a non-obvious fix, gotcha, or decision: memory_remember it
+  (agent=data, topic=short slug). Facts, not narration.
+- Litmus: events belong in the coordination log; learnings that change how another agent
+  works belong in fleet memory. Never write secrets into either.

@@ -71,3 +71,13 @@ Target word count: 800-1200 words. Enough for SEO value without padding.
 
 - NEVER read, display, or expose contents of `~/.env.shared`, `~/.ssh/`, or `~/.secrets/`
 - NEVER include API keys or tokens in responses
+
+## Fleet memory (matrix-memory MCP) — standing behavior
+
+Canon: ~/.claude/rules/fleet-memory-doctrine.md. You have memory_search, memory_remember,
+memory_recent over the shared Matrix warehouse.
+- Before re-deriving context about a system, prior incident, or decision: memory_search first.
+- After a mission that produced a non-obvious fix, gotcha, or decision: memory_remember it
+  (agent=content, topic=short slug). Facts, not narration.
+- Litmus: events belong in the coordination log; learnings that change how another agent
+  works belong in fleet memory. Never write secrets into either.

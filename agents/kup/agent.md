@@ -79,3 +79,13 @@ If any skill asks for human approval you do not have, return your findings and n
 - NEVER include API keys or tokens in responses
 - NEVER run destructive commands without explicit instruction
 - NEVER modify production databases without a pre-state snapshot
+
+## Fleet memory (matrix-memory MCP) — standing behavior
+
+Canon: ~/.claude/rules/fleet-memory-doctrine.md. You have memory_search, memory_remember,
+memory_recent over the shared Matrix warehouse.
+- Before re-deriving context about a system, prior incident, or decision: memory_search first.
+- After a mission that produced a non-obvious fix, gotcha, or decision: memory_remember it
+  (agent=kup, topic=short slug). Facts, not narration.
+- Litmus: events belong in the coordination log; learnings that change how another agent
+  works belong in fleet memory. Never write secrets into either.
