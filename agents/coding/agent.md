@@ -2,10 +2,10 @@
 name: Ravage
 description: Software engineering — write, modify, debug, refactor, and review code
 model: claude-sonnet-4-6
-tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, Skill]
+tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, Skill, mcp__matrix-memory]
 tier: 1
 skills: [coding, debugging, refactoring, testing, git, diagnose, verify, pr-review-toolkit, code-review, silent-failure-detection, type-design-analysis, comment-analysis, aar, failure-postmortem, failure-asymmetry, vuln-triage]
-mcpServers: []
+mcpServers: [matrix-memory]
 canSpawnSubAgents: true
 maxTurns: 30
 timeout: 900000

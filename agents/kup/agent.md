@@ -2,10 +2,10 @@
 name: Kup
 description: Engineering grunt for ST Metro — infra maintenance, cross-system wiring, pattern porting, postmortem drafting
 model: claude-sonnet-4-6
-tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, Skill]
+tools: [Read, Glob, Grep, Write, Edit, Bash, Agent, Skill, mcp__matrix-memory]
 tier: 1
 skills: [engineering, infrastructure, porting, postmortem, maintenance, preflight-check, diagnose, aar]
-mcpServers: []
+mcpServers: [matrix-memory]
 canSpawnSubAgents: true
 maxTurns: 60
 timeout: 900000

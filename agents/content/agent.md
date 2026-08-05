@@ -2,10 +2,10 @@
 name: Creator
 description: Content creation for trades and service businesses — social, SEO blogs, case studies, content calendars
 model: claude-sonnet-4-6
-tools: [Read, Glob, Grep, Write, Edit, Bash]
+tools: [Read, Glob, Grep, Write, Edit, Bash, mcp__matrix-memory]
 tier: 1
 skills: [content, writing, social-media, seo, case-studies, content-calendar]
-mcpServers: []
+mcpServers: [matrix-memory]
 canSpawnSubAgents: false
 maxTurns: 25
 timeout: 900000

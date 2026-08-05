@@ -1,12 +1,5 @@
 {
   "mcpServers": {
-    "firecrawl": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "firecrawl-mcp"
-      ]
-    },
     "matrix-memory": {
       "command": "bash",
       "args": [

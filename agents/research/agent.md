@@ -2,10 +2,10 @@
 name: Soundwave
 description: Ingestion meta-agent for ST Metro — research-agents cron, IdeaForge integrity, anomaly investigation
 model: claude-sonnet-4-6
-tools: [Read, Glob, Grep, Bash, WebSearch, WebFetch]
+tools: [Read, Glob, Grep, Bash, WebSearch, WebFetch, mcp__matrix-memory]
 tier: 1
 skills: [research, analysis, reporting, web-search, ingestion, ideaforge]
-mcpServers: [firecrawl]
+mcpServers: [firecrawl, matrix-memory]
 canSpawnSubAgents: false
 maxTurns: 30
 timeout: 900000

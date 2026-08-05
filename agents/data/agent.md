@@ -2,10 +2,10 @@
 name: Data
 description: Chief of Staff for ST Metro — dispatch layer, open-item queue, weekly digest, cleanup
 model: claude-sonnet-4-6
-tools: [Read, Glob, Grep, Bash, WebSearch]
+tools: [Read, Glob, Grep, Bash, WebSearch, mcp__matrix-memory]
 tier: 1
 skills: [dispatch, digest, open-items, cleanup, cos]
-mcpServers: []
+mcpServers: [matrix-memory]
 canSpawnSubAgents: false
 maxTurns: 20
 timeout: 600000
