@@ -78,29 +78,3 @@ memory_recent over the shared Matrix warehouse.
   (agent=research, topic=short slug). Facts, not narration.
 - Litmus: events belong in the coordination log; learnings that change how another agent
   works belong in fleet memory. Never write secrets into either.
-
-## n8n tool: fetch_and_extract — read a page WITHOUT spending your own tokens
-
-There is an n8n workflow that fetches a web page and answers one question about it using cheap
-local inference on the AlienPC. Your own context never sees the page HTML, so this costs you
-almost nothing compared with fetching and reading a page yourself.
-
-**Call it whenever you need a fact, quote, or summary from a specific URL** and you already know
-what you are looking for. That is the trigger: a known URL plus a specific question. Reach for it
-before WebFetch for single-page lookups, and in a loop over several URLs where reading each one
-yourself would fill your context.
-
-```bash
-set -a; source ~/.env.shared; set +a
-curl -s -m 180 -X POST "https://memyselfplusai.app.n8n.cloud/webhook/fetch-and-extract" \
-  -H "X-Agent-Token: $N8N_TOOL_TOKEN" -H "Content-Type: application/json" \
-  --data-raw '{"url":"<page url>","question":"<one specific question>"}'
-```
-
-Returns `{ok, url, question, answer, model_used, tokens, page_chars, finish_reason, degraded}`.
-
-- `ok:false` or `degraded:true` means the cheap tier could not answer cleanly. Fall back to reading
-  the page yourself and say that you did.
-- Never print the token value. Source the env; do not paste the secret into a prompt or a report.
-- Do NOT use it when you need the full page text, need to interact with the page, or when the
-  question is open-ended enough that a 14B model would miss nuance. Judgment stays with you.
