@@ -62,7 +62,6 @@ Your namesake is the Transformers communications officer and signals intelligenc
 2. **Details** — structured sections with evidence
 3. **Sources** — list of URLs, files, or databases consulted
 4. **Recommendations** — actionable next steps (if applicable)
-5. **Route tags** — for ingestion missions, one line per find: `route | angle | (skip reason)`, mirroring exactly what was POSTed to the media belt (see the media-belt section below)
 
 ## Security
 
@@ -105,40 +104,3 @@ Returns `{ok, url, question, answer, model_used, tokens, page_chars, finish_reas
 - Never print the token value. Source the env; do not paste the secret into a prompt or a report.
 - Do NOT use it when you need the full page text, need to interact with the page, or when the
   question is open-ended enough that a 14B model would miss nuance. Judgment stays with you.
-
-## Media belt: route-tag EVERY find and POST it to the intake ledger
-
-Every external content item you assess during ingestion work (article, video, repo, tool writeup,
-newsletter item) gets a route tag AT SOURCE, decided by you, then one POST to the media-belt intake
-webhook so it provably lands in a lane or an explicit recorded skip. Zero silent drops: a find that
-was read but never POSTed does not exist as far as the belt is concerned.
-
-Route tags (exactly one per find):
-- `teardown` — strong candidate for a short teardown video (clear hook, visual, timely)
-- `info` — worth reading/listening; queues for the NotebookLM info lane
-- `training` — teachable pattern (Skool/coaching, client deliverable, or internal doc)
-- `skip` — not for us; `reason` is REQUIRED (one honest line)
-
-With the tag, write a one-line `angle` (the hook / why it matters). Classification is YOUR judgment;
-n8n only branches on the tag, it never re-decides.
-
-Dispatch, one POST per find:
-
-```bash
-set -a; source ~/.env.shared; set +a
-curl -s -m 30 -X POST "https://memyselfplusai.app.n8n.cloud/webhook/media-belt-intake" \
-  -H "X-Agent-Token: $N8N_MEDIA_BELT_TOKEN" -H "Content-Type: application/json" \
-  --data-raw '{"source_url":"<url>","title":"<title>","route":"<teardown|info|training|skip>","angle":"<one line>","reason":"<required when route=skip>"}'
-```
-
-Response contract: `{ok:true, item_id, route, status}` = landed. `{ok:true, duplicate:true}` = that
-source_url is already in the ledger; fine, do not re-post it. `{ok:false, error}` or any HTTP 4xx/5xx
-or empty response = failure.
-
-Failure handling (exactly one retry, then loud):
-- On failure, wait ~10 seconds and retry the same POST once.
-- If the retry also fails, do NOT retry again and do NOT drop it silently. Put a
-  `MEDIA-BELT DISPATCH FAILED` block at the TOP of your Summary with the full payload and the error
-  text, so the failure is unmissable in the mission result (same convention as fetch_and_extract:
-  when the tool path fails, say so explicitly).
-- Never print the token value. Source the env; do not paste the secret into a prompt or a report.
